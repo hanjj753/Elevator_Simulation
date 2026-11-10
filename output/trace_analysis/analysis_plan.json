@@ -1,0 +1,21 @@
+{
+  "date_local": "2026-11-08",
+  "stage": "Exploratory instrumentation of already-completed replication data, not a new independent sample",
+  "input_results": "output/ablation_replication/results.json",
+  "condition": "congested/down_peak",
+  "demand_seeds": "Use all 30 planned demand seeds from the replication",
+  "policies": "age_order_eta once and redispatch_eta for all five saved order seeds",
+  "expected_instrumented_replays": 180,
+  "question": "Is the upper-floor age-order waiting increase concentrated before the first actual service stop or in re-waiting after that stop?",
+  "outcomes": [
+    "Arrival-to-first-service-stop waiting time",
+    "First-service-stop-to-boarding waiting time",
+    "Passenger exposure to hall-call reassignment while waiting",
+    "Proportion rejected at least once at an actual service stop"
+  ],
+  "cohorts": {"all": [1, 25], "lower": [2, 9], "middle": [10, 17], "upper": [18, 25]},
+  "matching": "Exact same passenger IDs and demands across policies. Neutral order replicates averaged within demand seed before inference",
+  "verification": "Every instrumented run must exactly reproduce its previously saved outcome metrics",
+  "illustration_selection": "Use the demand seed nearest to the median saved run-level P95 difference. Use the first saved neutral order seed for its concrete route replay; the illustrated route is not the five-order average",
+  "limitations": "First service stop includes rejection or boarding but not full-car bypass. Waiting components describe temporal location of burden and do not alone identify a causal routing mechanism"
+}

@@ -1,0 +1,7 @@
+{
+  "criterion": "Use the demand seed nearest to the median saved run-level P95 difference. Use the first saved neutral order seed for its concrete route replay; the illustrated route is not the five-order average",
+  "demand_seed": 202411191,
+  "median_saved_p95_difference_seconds": 43.19914975061627,
+  "selected_saved_p95_difference_seconds": 46.274540279996245,
+  "neutral_order_seed": 6619
+}

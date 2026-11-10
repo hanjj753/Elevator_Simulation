@@ -1,0 +1,32 @@
+{
+  "purpose": "Illustrative replay, not an independent statistical experiment",
+  "config": {
+    "floors": 25,
+    "elevator_count": 3,
+    "capacity": 12,
+    "floor_height_m": 3.5,
+    "max_speed_mps": 2.5,
+    "acceleration_mps2": 1.0,
+    "door_seconds": 4,
+    "boarding_seconds_per_passenger": 0.8,
+    "alighting_seconds_per_passenger": 0.6,
+    "duration_seconds": 300,
+    "arrival_rate_per_second": 0.3,
+    "long_wait_seconds": 60.0,
+    "priority_wait_seconds": 45.0,
+    "priority_redispatch_interval": 5,
+    "dominant_flow_share": 0.85,
+    "initial_floors": [
+      1,
+      1,
+      1
+    ]
+  },
+  "demand_seed": 202411189,
+  "traffic_pattern": "down_peak",
+  "strategies": [
+    "redispatch_eta",
+    "age_order_eta"
+  ],
+  "neutral_order_seed": 6619
+}

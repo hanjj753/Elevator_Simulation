@@ -1,0 +1,68 @@
+{
+  "question": "Does age ordering add benefit beyond redispatch itself?",
+  "design": "Three policies; identical fixed redispatch clock for both redispatch policies",
+  "first_redispatch_second": 45,
+  "redispatch_interval_seconds": 5,
+  "candidate_calls": "All pending hall calls; onboard destinations and in-flight targets retained",
+  "age_definition": "Earliest arrival of a passenger still waiting in this hall call",
+  "neutral_order": "Age-independent seeded permutation of floor/direction keys at each clock tick",
+  "order_seeds": [
+    6619,
+    7727,
+    8837,
+    9941,
+    11047
+  ],
+  "base_demand_seed": 202411189,
+  "demand_runs_per_condition": 30,
+  "traffic_levels": {
+    "normal": 0.12,
+    "congested": 0.3
+  },
+  "traffic_patterns": [
+    "down_peak"
+  ],
+  "config": {
+    "floors": 25,
+    "elevator_count": 3,
+    "capacity": 12,
+    "floor_height_m": 3.5,
+    "max_speed_mps": 2.5,
+    "acceleration_mps2": 1.0,
+    "door_seconds": 4,
+    "boarding_seconds_per_passenger": 0.8,
+    "alighting_seconds_per_passenger": 0.6,
+    "duration_seconds": 1800,
+    "arrival_rate_per_second": 0.12,
+    "long_wait_seconds": 60.0,
+    "priority_wait_seconds": 45.0,
+    "priority_redispatch_interval": 5,
+    "dominant_flow_share": 0.85,
+    "initial_floors": [
+      1,
+      1,
+      1
+    ]
+  },
+  "primary_outcome": "Mean of per-run P95, after averaging neutral order replicates within each demand run",
+  "primary_contrast": "age_order_eta minus redispatch_eta",
+  "cohort_definition": "Top ceil(5% * N) longest-waiting passenger IDs under ETA, fixed across policies",
+  "failure_definition": "Rejection at an actual stop; full-car bypass not counted",
+  "bootstrap": {
+    "resamples": 10000,
+    "unit": "Demand-run pair after averaging order replicates",
+    "interval": "95% percentile, exploratory, no multiple-comparison adjustment"
+  },
+  "limitations": [
+    "Conditional on simplified inherited boarding, movement, and ETA information model",
+    "Fixed-clock age_order_eta differs from historical age-triggered priority_eta",
+    "Neutral policy averages a finite set of random order streams",
+    "ETA-defined long-wait cohort is descriptive, selected using its baseline outcome",
+    "Floor summaries average runs with observed arrivals, not equally weighted passengers"
+  ],
+  "source_sha256": {
+    "elevator_sim.py": "e2d406be80d2f272e576b8a3b5df82fd3eceddb523d27b2634284da3de9a31a1",
+    "ablation_experiment.py": "94659c921436c6ba25e64c63f23299fa532f18f4caac22b54b70444bc82aba15",
+    "validate_results.py": "4ebdd3a3962467a564cf246b355160d6d15ccf32c8dfa690453453506370612d"
+  }
+}

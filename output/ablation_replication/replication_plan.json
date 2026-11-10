@@ -1,0 +1,34 @@
+{
+  "plan_date_local": "2026-11-08",
+  "study_stage": "Independent-seed follow-up after exploratory discovery; not externally preregistered",
+  "discovery_results": "output/ablation/results.json",
+  "discovery_base_demand_seed": 202410189,
+  "discovery_order_seeds": [1103, 2207, 3301, 4409, 5501],
+  "base_demand_seed": 202411189,
+  "demand_runs_per_condition": 30,
+  "order_seeds": [6619, 7727, 8837, 9941, 11047],
+  "traffic_levels": {"normal": 0.12, "congested": 0.3},
+  "traffic_patterns": ["down_peak"],
+  "duration_seconds": 1800,
+  "expected_simulations": 420,
+  "primary_hypothesis": {
+    "id": "H3a",
+    "condition": "congested/down_peak",
+    "contrast": "age_order_eta minus redispatch_eta",
+    "outcome": "Mean of per-demand-run P95 waiting time",
+    "predicted_direction": "positive",
+    "decision_rule": "Report effect and two-sided 95% paired percentile bootstrap interval from 10000 resamples; an interval wholly above zero supports the predicted direction in this model"
+  },
+  "secondary_hypothesis": {
+    "id": "H3b",
+    "condition": "congested/down_peak; origins 18 through 25",
+    "contrast": "age_order_eta minus redispatch_eta",
+    "outcome": "Mean waiting time in the fixed origin-floor band",
+    "predicted_direction": "positive",
+    "weighting": "Passenger-weighted within each demand run; equal weight across paired demand runs"
+  },
+  "additional_outcomes": "Overall mean wait, other floor bands and normal/down_peak are secondary descriptive follow-up outcomes; intervals are not multiplicity-adjusted",
+  "sample_size_rule": "Run all 30 planned demand seeds without stopping early or replacing seeds based on results",
+  "neutral_replicate_rule": "Average all five order replicates within each demand seed before inference; n=30, not n=150",
+  "interpretation_limit": "This tests robustness to new demand and ordering seeds in the same simplified simulator, not real-building validity or a proven vehicle-routing mechanism"
+}

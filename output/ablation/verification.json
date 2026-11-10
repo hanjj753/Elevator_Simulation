@@ -1,0 +1,10 @@
+{
+  "simulations": 1260,
+  "journey_rows": 477477,
+  "paired_demand_groups": 180,
+  "all_journeys_complete": true,
+  "demand_and_cohorts_paired": true,
+  "neutral_replicates_averaged_within_demand": true,
+  "source_and_archive_hashes_match": true,
+  "results_sha256": "ac5ad0972783348fe6758f97534f3deda40f25781f3550518e90c1e97f07c53d"
+}

@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1040" height="470" viewBox="0 0 1040 470">
+<rect width="100%" height="100%" fill="white"/>
+<g font-family="Malgun Gothic, Apple SD Gothic Neo, sans-serif" fill="#172b3a">
+<text x="36" y="48" font-size="25" font-weight="700">18–25층 대기시간은 어느 구간에서 늘었는가?</text>
+<text x="36" y="78" font-size="16">혼잡 퇴근형 · 기존 재현 자료의 30개 승객 씨앗 · B 순서 5회 평균 후 반복 평균</text>
+<path d="M240.0 115V265" stroke="#e4e9ed"/><text x="240.0" y="290" text-anchor="middle" font-size="14">0</text>
+<path d="M356.66666666666663 115V265" stroke="#e4e9ed"/><text x="356.66666666666663" y="290" text-anchor="middle" font-size="14">40</text>
+<path d="M473.3333333333333 115V265" stroke="#e4e9ed"/><text x="473.3333333333333" y="290" text-anchor="middle" font-size="14">80</text>
+<path d="M590.0 115V265" stroke="#e4e9ed"/><text x="590.0" y="290" text-anchor="middle" font-size="14">120</text>
+<path d="M706.6666666666666 115V265" stroke="#e4e9ed"/><text x="706.6666666666666" y="290" text-anchor="middle" font-size="14">160</text>
+<path d="M823.3333333333333 115V265" stroke="#e4e9ed"/><text x="823.3333333333333" y="290" text-anchor="middle" font-size="14">200</text>
+<path d="M940.0 115V265" stroke="#e4e9ed"/><text x="940.0" y="290" text-anchor="middle" font-size="14">240</text>
+<text x="36" y="154" font-size="18">B  무작위 호출 순서</text>
+<rect x="240" y="126" width="366.9261288511331" height="42" fill="#25658d"/>
+<rect x="606.9261288511332" y="126" width="271.1598606062836" height="42" fill="#ca7a35"/>
+<text x="888.0859894574168" y="154" font-size="17">218.77초</text>
+<text x="36" y="234" font-size="18">C  오래된 호출 순서</text>
+<rect x="240" y="206" width="386.7480149439013" height="42" fill="#25658d"/>
+<rect x="626.7480149439014" y="206" width="301.2836420660213" height="42" fill="#ca7a35"/>
+<text x="938.0316570099226" y="234" font-size="17">235.90초</text>
+<text x="995" y="290" font-size="14">초</text>
+<rect x="36" y="323" width="16" height="16" fill="#25658d"/><text x="63" y="338" font-size="18">첫 정차 응답 전: C−B +6.80초  (95% 구간 -0.29, +13.92)</text>
+<rect x="36" y="365" width="16" height="16" fill="#ca7a35"/><text x="63" y="380" font-size="18">첫 응답 후 재대기: C−B +10.33초  (95% 구간 +0.08, +20.70)</text>
+<text x="36" y="434" font-size="14">첫 응답 = 해당 호출에 배정된 차량의 실제 정차. 만원 무정차 통과는 제외. 탐색적 분해이며 경로 인과 증명은 아님.</text>
+</g></svg>

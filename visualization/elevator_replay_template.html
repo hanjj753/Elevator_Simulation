@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>엘리베이터 배차 · 승하차 재생</title>
+<style>
+:root{font-family:"Malgun Gothic","Apple SD Gothic Neo",sans-serif;color:#172b3a;background:#f1f4f6;color-scheme:light}
+*{box-sizing:border-box}body{margin:0;padding:24px}main{max-width:1440px;margin:auto}h1{font-size:25px;letter-spacing:-.7px;margin:0 0 7px}.intro{font-size:13px;color:#526776;line-height:1.7;margin:0 0 18px}
+.toolbar{display:flex;gap:12px;align-items:center;flex-wrap:wrap;padding:14px 18px;background:#fff;border:1px solid #d7e1e7;border-radius:10px 10px 0 0}
+button,select{font:inherit;font-size:14px;border:1px solid #bdcbd4;background:#fff;color:#172b3a;border-radius:5px;padding:8px 12px;cursor:pointer}button:hover{background:#edf3f6}button:focus-visible,select:focus-visible,input:focus-visible{outline:3px solid #73a5cf;outline-offset:3px}#play{background:#215f83;color:white;border-color:#215f83;min-width:91px}label{font-size:13px;display:flex;gap:8px;align-items:center}.timeline{flex:1;min-width:230px}input[type=range]{width:100%;accent-color:#215f83;cursor:pointer}output{font-size:14px;font-variant-numeric:tabular-nums;min-width:130px}#export{margin-left:auto}
+.stage{background:#fff;border:1px solid #d7e1e7;border-top:0;overflow:auto;border-radius:0 0 10px 10px}#scene{display:block;width:100%;min-width:840px;height:auto}details{margin:14px 0;background:white;border:1px solid #d7e1e7;border-radius:7px;padding:12px 16px;font-size:13px;line-height:1.8}summary{cursor:pointer;font-weight:bold}.footnote{font-size:12px;color:#526776;margin:12px 2px;line-height:1.8}.events{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:14px;margin-top:14px}.eventbox{padding:13px 16px;border:1px solid #d7e1e7;border-radius:7px;background:white;font-size:12px;min-height:90px}.eventbox h2{font-size:13px;margin:0 0 7px}.eventline{line-height:1.8;color:#405767;font-variant-numeric:tabular-nums}#passengerInfo{padding:10px 2px;font-size:13px;min-height:40px;color:#215f83}
+@media(max-width:720px){body{padding:12px}h1{font-size:21px}.toolbar{gap:8px;padding:10px}.timeline{order:5;flex-basis:100%}#scene{max-height:none}#export{margin-left:0}}
+@media print{body{padding:0;background:#fff}.toolbar,.events,details,#passengerInfo{display:none}#scene{max-height:none;min-width:0}.stage{border:0}}
+</style>
+</head>
+<body><main>
+<h1>같은 승객, 다른 호출 순서</h1>
+<p class="intro" id="context"></p>
+<div class="toolbar" aria-label="재생 조작">
+<button id="play" type="button">▶ 재생</button><button id="step" type="button">1초 이동</button>
+<label>속도 <select id="speed"><option value="1">1배</option><option value="4">4배</option><option value="12" selected>12배</option><option value="30">30배</option><option value="60">60배</option></select></label>
+<label class="timeline"><span>시각</span><input id="timeline" type="range" min="0" value="0" step="0.1" aria-label="시뮬레이션 시각"></label>
+<output id="clock"></output><button id="export" type="button">현재 장면 SVG 저장</button>
+<label>시각 이동(초) <input id="jump" type="number" min="0" value="0" style="width:85px;padding:7px;border:1px solid #bdcbd4;border-radius:4px"></label>
+</div>
+<div class="stage"><svg id="scene" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="svgTitle svgDesc"></svg></div>
+<div id="passengerInfo" aria-live="polite">차량 안의 원을 누르면 해당 승객의 출발층·목적층과 승하차 시각을 확인할 수 있습니다.</div>
+<div class="events" id="eventPanels" aria-label="최근 승하차 기록"></div>
+<p class="footnote" id="note"></p>
+<details><summary>표시와 모형의 관계</summary>
+차량 안의 원 하나는 실제로 계산한 승객 여정 하나입니다. 탑승은 파란 원, 하차는 초록 원의 이동으로 나타내고, 정차 시 탑승 거절은 붉은 테두리로 표시합니다. 승하차 화살표는 해당 시점의 사건을 약 2초 동안 강조하므로 정확한 인원수는 차량·대기열 숫자를 기준으로 읽습니다.<br>
+Python이 계산한 1초 간격 상태를 재생합니다. 층 사이의 차량 위치는 원래 이동시간에 맞춰 보간하며 배차를 다시 계산하지 않습니다. 모형은 정차 순간에 승하차를 반영한 뒤 인원에 따른 정차시간을 적용합니다. 원의 짧은 이동은 설명용 표시이며 개별 승객의 실제 보행 시간을 측정한 것이 아닙니다.<br>
+대기열에는 상행·하행 인원과 가장 오래 기다린 시간을 표시합니다. 층별 대기 원은 최대 6개까지 표시하며 전체 인원은 숫자를 기준으로 읽습니다. 색은 30초 미만·30~60초·60초 초과를 구분합니다. 만원 차량의 무정차 통과는 탑승 거절 수에 포함되지 않습니다. 승객 발생 구간 이후에도 기존 승객이 모두 도착할 때까지 재생합니다. 아래 지표는 현재 시각까지의 잠정 지표가 아닌 전체 실행 결과입니다. B 화면은 특정 순서 씨앗 한 개의 경로입니다.
+</details>
+</main>
+<script id="replayData" type="application/json">__REPLAY_DATA__</script>
+<script>
+'use strict';
+const data=JSON.parse(document.getElementById('replayData').textContent);
+const scene=document.getElementById('scene'), NS='http://www.w3.org/2000/svg';
+const names={eta:'A · 기본 ETA',redispatch_eta:'B · 무작위 호출 순서',age_order_eta:'C · 오래된 호출 순서'};
+const patterns={down_peak:'퇴근형',up_peak:'출근형',interfloor:'층간형',uniform:'균일 무작위형'};
+const colors={blue:'#25658d',green:'#278263',red:'#b3463e',orange:'#ca7a35',ink:'#172b3a',muted:'#5d7484'};
+const maxTime=Math.max(...data.traces.map(d=>d.frames.length-1));
+const floors=Math.max(...data.traces.map(d=>d.config.floors));
+const rowStep=Math.min(22,Math.max(14,500/(floors-1))), gridTop=122, gridBottom=gridTop+(floors-1)*rowStep;
+const panelHeight=gridBottom+98, panelWidth=Math.max(600,260+data.traces[0].config.elevator_count*100), width=28+data.traces.length*(panelWidth+16), height=panelHeight+122;
+scene.setAttribute('viewBox',`0 0 ${width} ${height}`);scene.setAttribute('width',width);scene.setAttribute('height',height);
+function el(tag,attrs={},text,parent=scene){const e=document.createElementNS(NS,tag);for(const[k,v]of Object.entries(attrs))e.setAttribute(k,v);if(text!==undefined)e.textContent=text;parent.appendChild(e);return e;}
+function txt(parent,x,y,text,size=14,attrs={}){return el('text',{x,y,'font-size':size,...attrs},text,parent);}
+function floorY(f){return gridTop+(floors-f)*rowStep;}
+function clock(t){t=Math.floor(t);return `${String(Math.floor(t/60)).padStart(2,'0')}:${String(t%60).padStart(2,'0')}`;}
+function num(v){return v==null?'해당 없음':`${v.toFixed(1)}초`;}
+el('title',{id:'svgTitle'},'엘리베이터 승하차와 층별 대기열 비교');el('desc',{id:'svgDesc'},'같은 Python 승객 발생 자료로 계산한 배차 방식별 차량 위치와 실제 승하차 기록');
+el('rect',{width,height,fill:'white'});
+const root=el('g',{'font-family':'Malgun Gothic, Apple SD Gothic Neo, sans-serif',fill:colors.ink});
+txt(root,22,30,'같은 승객 발생 자료로 비교한 엘리베이터 운행',22,{'font-weight':700});
+const svgTime=txt(root,width-24,30,'',19,{'text-anchor':'end','font-weight':700});
+txt(root,22,54,`${patterns[data.traffic_pattern]} · ${data.traces[0].config.floors}층 / ${data.traces[0].config.elevator_count}대 / 정원 ${data.traces[0].config.capacity}명 · 승객 씨앗 ${data.demand_seed}`,13,{fill:colors.muted});
+const ui=data.traces.map((trace,index)=>{
+ const g=el('g',{transform:`translate(${14+index*(panelWidth+16)},75)`},undefined,root);
+ el('rect',{x:0,y:0,width:panelWidth,height:panelHeight,rx:7,fill:'#fff',stroke:'#d6e1e8'},undefined,g);
+ txt(g,18,29,names[trace.strategy]||trace.strategy,20,{'font-weight':700});
+ txt(g,18,51,trace.strategy==='eta'?'최초 ETA 배정 유지 · 주기적 재배분 없음':trace.order_seed==null?'호출 나이: 현재 대기 승객 중 가장 이른 도착 기준':`호출 나이와 독립적인 순서 · 순서 씨앗 ${trace.order_seed}`,12,{fill:colors.muted});
+ const count=txt(g,18,79,'',15,{'font-weight':700});
+ txt(g,28,102,'층',11,{fill:colors.muted});txt(g,69,102,'↑ 명',11,{fill:colors.muted});txt(g,109,102,'↓ 명',11,{fill:colors.muted});txt(g,153,102,'대기',11,{fill:colors.muted});txt(g,203,102,'최장(초)',11,{fill:colors.muted});
+ const queueRows=[];
+ for(let f=floors;f>=1;f--){const y=floorY(f),q=el('g',{},undefined,g);
+  el('path',{d:`M18 ${y+rowStep*.48}H${panelWidth-18}`,stroke:'#e8eef2','stroke-width':.8},undefined,q);
+  txt(q,40,y+4,`${f}`,12,{'text-anchor':'end',fill:colors.muted});
+  const up=txt(q,78,y+4,'0',12,{'text-anchor':'middle'}),down=txt(q,118,y+4,'0',12,{'text-anchor':'middle'});
+  const dots=[];for(let j=0;j<6;j++)dots.push(el('circle',{cx:148+j*7,cy:y,r:2.5,fill:colors.blue,visibility:'hidden'},undefined,q));
+  const age=txt(q,224,y+4,'—',10,{'text-anchor':'middle'});queueRows[f-1]={up,down,dots,age};
+ }
+ const cars=Array.from({length:trace.config.elevator_count},(_,i)=>{
+  const x=267+i*100;
+  el('rect',{x:x-4,y:gridTop-13,width:76,height:gridBottom-gridTop+26,rx:3,fill:'#f3f6f8',stroke:'#dce5eb'},undefined,g);
+  txt(g,x+34,102,`E${i+1}`,12,{'text-anchor':'middle',fill:colors.muted});
+  const car=el('g',{},undefined,g);
+  const body=el('rect',{x,y:-13,width:68,height:27,rx:4,fill:'#e1eef5',stroke:colors.blue,'stroke-width':1.5},undefined,car);
+  const dots=[];for(let j=0;j<trace.config.capacity;j++){
+   const columns=4,spacing=Math.min(7,16/Math.max(1,Math.ceil(trace.config.capacity/columns)-1));
+   const dot=el('circle',{cx:x+8+(j%columns)*7,cy:-8+Math.floor(j/columns)*spacing,r:2.4,fill:colors.blue,tabindex:0,role:'button'},undefined,car);
+   dot.addEventListener('click',()=>showPassenger(trace,dot.dataset.pid));dot.addEventListener('keydown',e=>{if(e.key==='Enter')showPassenger(trace,dot.dataset.pid);});dots.push(dot);
+  }
+  const label=txt(car,x+51,4,'0',12,{'text-anchor':'middle','font-weight':700});
+  return {g:car,body,dots,label,x};
+ });
+ const overlay=el('g',{},undefined,g);
+ const footer=gridBottom+39;
+ txt(g,18,footer,'전체 실행 결과',12,{'font-weight':700,fill:colors.muted});
+ txt(g,18,footer+24,`평균 ${num(trace.metrics.mean_wait_seconds)}     P95 ${num(trace.metrics.p95_wait_seconds)}`,14,{'font-weight':700});
+ txt(g,18,footer+44,`정차 시 거절 경험 ${trace.metrics.passengers?(100*trace.metrics.boarding_failure_rate).toFixed(1):'0.0'}% · 전체 ${trace.metrics.passengers}개 여정`,11,{fill:colors.muted});
+ const box=document.createElement('div');box.className='eventbox';const h=document.createElement('h2');h.textContent=names[trace.strategy];box.appendChild(h);const lines=document.createElement('div');box.appendChild(lines);document.getElementById('eventPanels').appendChild(box);
+ const passengerById=new Map(trace.passengers.map(p=>[p.passenger_id,p]));
+ const stops=trace.events.filter(e=>e.type==='stop');
+ return {trace,g,count,queueRows,cars,overlay,lines,stops,passengerById};
+});
+const legendY=height-29;
+[{c:colors.blue,t:'탑승 / 차량 내 승객'},{c:colors.green,t:'하차'},{c:colors.red,t:'정차 시 탑승 거절'}].forEach((s,i)=>{el('circle',{cx:25+i*205,cy:legendY-4,r:4,fill:s.c},undefined,root);txt(root,37+i*205,legendY,s.t,12);});
+txt(root,width-22,legendY,'원 1개 = 1명 · 층 대기 원 최대 6개 · 색: <30 / 30–60 / >60초',11,{'text-anchor':'end',fill:colors.muted});
+document.getElementById('context').textContent=`Python이 계산한 차량 이동·대기열·승하차를 동기 재생합니다. ${patterns[data.traffic_pattern]} · 분당 ${(data.traces[0].config.arrival_rate_per_second*60).toFixed(1)}명 · 승객 발생 ${data.traces[0].config.duration_seconds}초 후 전원 도착까지`;
+document.getElementById('note').textContent=data.note+' 화면의 단일 실행 수치를 30회 반복 평균으로 해석하지 않습니다. SVG 저장은 현재 장면을 벡터 그림으로 내려받습니다.';
+function showPassenger(trace,pid){if(pid===undefined)return;const p=trace.passengers.find(p=>p.passenger_id===Number(pid));if(!p)return;document.getElementById('passengerInfo').textContent=`${names[trace.strategy]} · 승객 #${p.passenger_id} · ${p.origin}층 → ${p.destination}층 · 도착 ${p.arrival_time.toFixed(1)}초 · 탑승 ${p.boarding_time.toFixed(0)}초 · 하차 ${p.alighting_time.toFixed(0)}초 · 대기 ${(p.boarding_time-p.arrival_time).toFixed(1)}초 · 정차 시 거절 ${p.failed_boardings}회`;}
+let time=0,playing=false,lastTimestamp=null,lastSecond=-1;
+const timeline=document.getElementById('timeline');timeline.max=maxTime;document.getElementById('jump').max=maxTime;
+function recentStops(stops,t,span){let low=0,high=stops.length;while(low<high){const m=(low+high)>>1;if(stops[m].time<=t)low=m+1;else high=m;}let start=low;while(start>0&&stops[start-1].time>t-span)start--;return stops.slice(start,low);}
+function render(){
+ const second=Math.floor(time),fraction=time-second;
+ svgTime.textContent=`${clock(time)} / ${clock(maxTime)}`;
+ document.getElementById('clock').textContent=`${clock(time)} / ${clock(maxTime)}`;timeline.value=time;document.getElementById('jump').value=second;
+ ui.forEach(panel=>{
+  const frames=panel.trace.frames,frame=frames[Math.min(second,frames.length-1)],next=frames[Math.min(second+1,frames.length-1)];
+  const [waiting,onboard,completed,arrived]=frame.counts;panel.count.textContent=`대기 ${waiting}명    탑승 중 ${onboard}명    도착 완료 ${completed}명 / 발생 ${arrived}명`;
+  frame.queues.forEach((q,i)=>{const row=panel.queueRows[i];if(!row)return;const color=q[2]>60?colors.red:q[2]>=30?colors.orange:colors.blue;row.up.textContent=q[0];row.down.textContent=q[1];row.up.setAttribute('fill',q[0]?color:'#b7c4cc');row.down.setAttribute('fill',q[1]?color:'#b7c4cc');row.age.textContent=q[0]+q[1]?Math.floor(q[2]):'—';row.age.setAttribute('fill',q[0]+q[1]?color:'#b7c4cc');row.dots.forEach((dot,j)=>{dot.setAttribute('visibility',j<q[0]+q[1]?'visible':'hidden');dot.setAttribute('fill',color);});});
+  panel.cars.forEach((car,i)=>{const state=frame.cars[i],after=next.cars[i];const floor=state[0]+fraction*(after[0]-state[0]);car.g.setAttribute('transform',`translate(0 ${floorY(floor)})`);car.body.setAttribute('fill',state[3]>0?'#e5f2eb':'#e1eef5');car.body.setAttribute('stroke',state[1]>=panel.trace.config.capacity?colors.orange:colors.blue);car.label.textContent=state[1];car.dots.forEach((dot,j)=>{const pid=state[5][j];dot.setAttribute('visibility',pid===undefined?'hidden':'visible');dot.dataset.pid=pid===undefined?'':pid;dot.setAttribute('aria-label',pid===undefined?'빈 자리':`승객 ${pid}`);});});
+  panel.overlay.replaceChildren();
+  recentStops(panel.stops,time,2).forEach(stop=>{
+   const age=time-stop.time,progress=Math.min(1,age/1.2),y=floorY(stop.floor),car=panel.cars[stop.elevator];
+   // Events are highlights; the exact state already includes the exchange.
+   [{ids:stop.boarded,c:colors.blue,from:196,to:car.x+16,label:'탑승'}, {ids:stop.alighted,c:colors.green,from:car.x+16,to:246,label:'하차'}].forEach((group,k)=>{
+    group.ids.forEach((pid,j)=>{const x=group.from+(group.to-group.from)*progress;el('circle',{cx:x,cy:y-8+k*16+(j%3-1)*3,r:3,fill:group.c,opacity:Math.max(.25,1-age/2)},undefined,panel.overlay);});
+    if(group.ids.length)txt(panel.overlay,car.x+34,y-20-k*13,`${group.label} ${group.ids.length}명`,10,{fill:group.c,'text-anchor':'middle','font-weight':700});
+   });
+   if(stop.rejected.length){el('rect',{x:138,y:y-8,width:100,height:16,rx:3,fill:'none',stroke:colors.red,'stroke-width':1.5},undefined,panel.overlay);txt(panel.overlay,car.x+34,y+28,`거절 ${stop.rejected.length}명`,10,{fill:colors.red,'text-anchor':'middle','font-weight':700});}
+  });
+  if(second!==lastSecond){panel.lines.replaceChildren();const list=recentStops(panel.stops,time,120).slice(-3).reverse();if(!list.length){const row=document.createElement('div');row.className='eventline';row.textContent='최근 120초 안에 승하차 정차가 없습니다.';panel.lines.appendChild(row);}for(const stop of list){const row=document.createElement('div');row.className='eventline';row.textContent=`${clock(stop.time)} · E${stop.elevator+1} · ${stop.floor}층 · 탑승 ${stop.boarded.length} / 하차 ${stop.alighted.length} / 거절 ${stop.rejected.length}`;panel.lines.appendChild(row);}}
+ });lastSecond=second;
+}
+function setPlaying(value){playing=value;document.getElementById('play').textContent=value?'❚❚ 일시정지':'▶ 재생';lastTimestamp=null;}
+document.getElementById('play').addEventListener('click',()=>{if(time>=maxTime)time=0;setPlaying(!playing);render();});
+document.getElementById('step').addEventListener('click',()=>{setPlaying(false);time=Math.min(maxTime,Math.floor(time)+1);render();});
+timeline.addEventListener('input',()=>{setPlaying(false);time=Number(timeline.value);lastSecond=-1;render();});
+document.getElementById('jump').addEventListener('input',e=>{setPlaying(false);time=Math.max(0,Math.min(maxTime,Number(e.target.value)||0));lastSecond=-1;render();});
+document.getElementById('export').addEventListener('click',()=>{setPlaying(false);render();const svg=scene.cloneNode(true);svg.setAttribute('xmlns',NS);const blob=new Blob([new XMLSerializer().serializeToString(svg)],{type:'image/svg+xml;charset=utf-8'});const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`elevator_${data.demand_seed}_${Math.floor(time)}s.svg`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);});
+document.addEventListener('keydown',e=>{if(e.code==='Space'&&!['INPUT','SELECT','BUTTON'].includes(e.target.tagName)){e.preventDefault();document.getElementById('play').click();}});
+function animate(timestamp){if(playing){if(lastTimestamp!==null){time=Math.min(maxTime,time+Math.min(.1,(timestamp-lastTimestamp)/1000)*Number(document.getElementById('speed').value));render();if(time>=maxTime)setPlaying(false);}lastTimestamp=timestamp;}requestAnimationFrame(animate);}
+render();requestAnimationFrame(animate);
+</script>
+</body></html>

@@ -1,0 +1,168 @@
+{
+  "analysis_status": "Independent-seed follow-up; 18-25 floor band fixed in the saved plan before follow-up simulations; secondary outcome",
+  "bands": [
+    {
+      "name": "lobby",
+      "lowest_floor": 1,
+      "highest_floor": 1
+    },
+    {
+      "name": "lower",
+      "lowest_floor": 2,
+      "highest_floor": 9
+    },
+    {
+      "name": "middle",
+      "lowest_floor": 10,
+      "highest_floor": 17
+    },
+    {
+      "name": "upper",
+      "lowest_floor": 18,
+      "highest_floor": 25
+    }
+  ],
+  "weighting": "Passenger-weighted floor means within a demand run, then equal weight across observed demand runs",
+  "contrast": "age_order_eta minus redispatch_eta; negative favors age ordering",
+  "ci": "Unadjusted exploratory 95% paired percentile bootstrap",
+  "source_results_sha256": "f791cc1df9c5ad7bc824a1f1b55c29340517496cccdbd59db3254773c68b9567",
+  "effects": [
+    {
+      "traffic_level": "normal",
+      "traffic_pattern": "down_peak",
+      "origin_floor_band": "lobby",
+      "passengers_across_demand_runs": 41,
+      "age_mean_wait_seconds": 13.618873001387534,
+      "neutral_mean_wait_seconds": 14.767021149535681,
+      "effect": {
+        "runs": 27,
+        "mean_difference_seconds": -1.148148148148148,
+        "ci95_low_seconds": -3.9000925925925922,
+        "ci95_high_seconds": 1.4928240740740708,
+        "candidate_better_runs": 14,
+        "reference_better_runs": 11,
+        "equal_runs": 2
+      }
+    },
+    {
+      "traffic_level": "normal",
+      "traffic_pattern": "down_peak",
+      "origin_floor_band": "lower",
+      "passengers_across_demand_runs": 2174,
+      "age_mean_wait_seconds": 18.841790883033458,
+      "neutral_mean_wait_seconds": 18.98973135875802,
+      "effect": {
+        "runs": 30,
+        "mean_difference_seconds": -0.14794047572456334,
+        "ci95_low_seconds": -0.801202472424674,
+        "ci95_high_seconds": 0.5044198542351703,
+        "candidate_better_runs": 19,
+        "reference_better_runs": 11,
+        "equal_runs": 0
+      }
+    },
+    {
+      "traffic_level": "normal",
+      "traffic_pattern": "down_peak",
+      "origin_floor_band": "middle",
+      "passengers_across_demand_runs": 2157,
+      "age_mean_wait_seconds": 23.151116321072628,
+      "neutral_mean_wait_seconds": 22.904977869296292,
+      "effect": {
+        "runs": 30,
+        "mean_difference_seconds": 0.24613845177633753,
+        "ci95_low_seconds": -0.3330014988245943,
+        "ci95_high_seconds": 0.8344369423322276,
+        "candidate_better_runs": 12,
+        "reference_better_runs": 18,
+        "equal_runs": 0
+      }
+    },
+    {
+      "traffic_level": "normal",
+      "traffic_pattern": "down_peak",
+      "origin_floor_band": "upper",
+      "passengers_across_demand_runs": 2184,
+      "age_mean_wait_seconds": 28.385356735133417,
+      "neutral_mean_wait_seconds": 28.195438809311742,
+      "effect": {
+        "runs": 30,
+        "mean_difference_seconds": 0.1899179258216718,
+        "ci95_low_seconds": -0.7430765655911419,
+        "ci95_high_seconds": 1.1073547455884112,
+        "candidate_better_runs": 15,
+        "reference_better_runs": 15,
+        "equal_runs": 0
+      }
+    },
+    {
+      "traffic_level": "congested",
+      "traffic_pattern": "down_peak",
+      "origin_floor_band": "lobby",
+      "passengers_across_demand_runs": 98,
+      "age_mean_wait_seconds": 30.52220979342935,
+      "neutral_mean_wait_seconds": 31.12173360295316,
+      "effect": {
+        "runs": 30,
+        "mean_difference_seconds": -0.5995238095238093,
+        "ci95_low_seconds": -6.352832142857143,
+        "ci95_high_seconds": 5.418984126984128,
+        "candidate_better_runs": 18,
+        "reference_better_runs": 12,
+        "equal_runs": 0
+      }
+    },
+    {
+      "traffic_level": "congested",
+      "traffic_pattern": "down_peak",
+      "origin_floor_band": "lower",
+      "passengers_across_demand_runs": 5419,
+      "age_mean_wait_seconds": 40.394473752692726,
+      "neutral_mean_wait_seconds": 42.2712138347581,
+      "effect": {
+        "runs": 30,
+        "mean_difference_seconds": -1.8767400820653781,
+        "ci95_low_seconds": -3.711824215897304,
+        "ci95_high_seconds": -0.006208047641392023,
+        "candidate_better_runs": 18,
+        "reference_better_runs": 12,
+        "equal_runs": 0
+      }
+    },
+    {
+      "traffic_level": "congested",
+      "traffic_pattern": "down_peak",
+      "origin_floor_band": "middle",
+      "passengers_across_demand_runs": 5330,
+      "age_mean_wait_seconds": 52.933808591461236,
+      "neutral_mean_wait_seconds": 56.65014005002431,
+      "effect": {
+        "runs": 30,
+        "mean_difference_seconds": -3.716331458563073,
+        "ci95_low_seconds": -6.160883708721808,
+        "ci95_high_seconds": -1.1549937536570156,
+        "candidate_better_runs": 24,
+        "reference_better_runs": 6,
+        "equal_runs": 0
+      }
+    },
+    {
+      "traffic_level": "congested",
+      "traffic_pattern": "down_peak",
+      "origin_floor_band": "upper",
+      "passengers_across_demand_runs": 5397,
+      "age_mean_wait_seconds": 235.89656811768774,
+      "neutral_mean_wait_seconds": 218.7723392425429,
+      "effect": {
+        "runs": 30,
+        "mean_difference_seconds": 17.12422887514483,
+        "ci95_low_seconds": 2.3550343877884674,
+        "ci95_high_seconds": 32.31629284242272,
+        "candidate_better_runs": 10,
+        "reference_better_runs": 20,
+        "equal_runs": 0
+      }
+    }
+  ],
+  "replication_plan_sha256": "d620cc62120c8a6474f8bc1d69d99e1d1728fe3c7451140d5f09e2b994985b6a"
+}

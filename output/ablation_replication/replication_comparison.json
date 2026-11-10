@@ -1,0 +1,92 @@
+{
+  "plan_sha256": "d620cc62120c8a6474f8bc1d69d99e1d1728fe3c7451140d5f09e2b994985b6a",
+  "discovery_sha256": "ac5ad0972783348fe6758f97534f3deda40f25781f3550518e90c1e97f07c53d",
+  "followup_sha256": "f791cc1df9c5ad7bc824a1f1b55c29340517496cccdbd59db3254773c68b9567",
+  "disjoint_demand_and_order_seeds": true,
+  "verification": {
+    "simulations": 420,
+    "journey_rows": 159600,
+    "paired_demand_groups": 60,
+    "all_journeys_complete": true,
+    "demand_and_cohorts_paired": true,
+    "neutral_replicates_averaged_within_demand": true,
+    "source_and_archive_hashes_match": true,
+    "results_sha256": "f791cc1df9c5ad7bc824a1f1b55c29340517496cccdbd59db3254773c68b9567"
+  },
+  "stage_counts": {
+    "discovery_simulations": 1260,
+    "followup_simulations": 420,
+    "followup_journey_rows": 159600
+  },
+  "condition": "congested/down_peak",
+  "contrast": "age_order_eta minus redispatch_eta",
+  "primary_p95_seconds": {
+    "discovery": {
+      "runs": 30,
+      "mean_difference_seconds": 63.33332907369102,
+      "ci95_low_seconds": 31.996199265310675,
+      "ci95_high_seconds": 93.64220768833675,
+      "candidate_better_runs": 6,
+      "reference_better_runs": 24,
+      "equal_runs": 0
+    },
+    "followup": {
+      "runs": 30,
+      "mean_difference_seconds": 53.907799344436675,
+      "ci95_low_seconds": 8.85821679800562,
+      "ci95_high_seconds": 102.01826237499726,
+      "candidate_better_runs": 9,
+      "reference_better_runs": 21,
+      "equal_runs": 0
+    }
+  },
+  "secondary_upper_band_mean_seconds": {
+    "discovery": {
+      "runs": 30,
+      "mean_difference_seconds": 24.30345584164148,
+      "ci95_low_seconds": 13.01294533350655,
+      "ci95_high_seconds": 35.31189694615186,
+      "candidate_better_runs": 6,
+      "reference_better_runs": 24,
+      "equal_runs": 0,
+      "age_mean_wait_seconds": 246.0907048804009,
+      "neutral_mean_wait_seconds": 221.7872490387594
+    },
+    "followup": {
+      "runs": 30,
+      "mean_difference_seconds": 17.12422887514483,
+      "ci95_low_seconds": 2.3550343877884674,
+      "ci95_high_seconds": 32.31629284242272,
+      "candidate_better_runs": 10,
+      "reference_better_runs": 20,
+      "equal_runs": 0,
+      "age_mean_wait_seconds": 235.89656811768774,
+      "neutral_mean_wait_seconds": 218.7723392425429
+    }
+  },
+  "overall_mean_seconds": {
+    "discovery": {
+      "runs": 30,
+      "mean_difference_seconds": 7.367125679117791,
+      "ci95_low_seconds": 4.206141473548696,
+      "ci95_high_seconds": 10.554421743039754,
+      "candidate_better_runs": 5,
+      "reference_better_runs": 25,
+      "equal_runs": 0
+    },
+    "followup": {
+      "runs": 30,
+      "mean_difference_seconds": 4.000805961062219,
+      "ci95_low_seconds": -0.14376264827977778,
+      "ci95_high_seconds": 8.225554976245654,
+      "candidate_better_runs": 11,
+      "reference_better_runs": 19,
+      "equal_runs": 0
+    }
+  },
+  "hypothesis_decisions": {
+    "H3a": "supports predicted increase within this model",
+    "H3b": "supports predicted increase in secondary outcome"
+  },
+  "interpretation": "Fresh-seed robustness in the same simulator; no claim of external preregistration, real-building validity, or identified routing mechanism. Stages are not pooled."
+}
